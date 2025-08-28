@@ -1,0 +1,92 @@
+console.log(`ciao`);
+// In questo esercizio, utilizzerai Promise.all() per creare la funzione getDashboardData(query), che accetta una città come input e recupera simultaneamente:
+// Nome completo della città e paese da  /destinations?search=[query]
+// (result.name, result.country, nelle nuove proprietà city e country).
+// Il meteo attuale da /weathers?search={query}
+// (result.temperature e result.weather_description nella nuove proprietà temperature e weather).
+// Il nome dell’aeroporto principale da /airports?search={query}
+// (result.name nella nuova proprietà airport).
+// Utilizzerai Promise.all() per eseguire queste richieste in parallelo e poi restituirai un oggetto con i dati aggregati.
+// Attenzione: le chiamate sono delle ricerche e ritornano un’array ciascuna, di cui devi prendere il primo risultato (il primo elemento).
+// Note del docente
+// Scrivi la funzione getDashboardData(query), che deve:
+// Essere asincrona (async).
+// Utilizzare Promise.all() per eseguire più richieste in parallelo.
+// Restituire una Promise che risolve un oggetto contenente i dati aggregati.
+// Stampare i dati in console in un messaggio ben formattato.
+// Testa la funzione con la query "london"
+// Esempio di utilizzo
+// getDashboardData('london')
+//     .then(data => {
+//         console.log('Dasboard data:', data);
+//         console.log(
+//             `${data.city} is in ${data.country}.\n` +
+//             `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n`+
+//             `The main airport is ${data.airport}.\n`
+//         );
+//     })
+//     .catch(error => console.error(error));
+// Esempio di output atteso
+// // Risposta API
+// {
+//   city: "London",
+//   country: "United Kingdom",
+//   temperature: 18,
+//     weather: "Partly cloudy",
+//   airport: "London Heathrow Airport"
+// }
+// ​
+// // Output in console
+// London is in United Kingdom.
+// Today there are 18 degrees and the weather is Partly cloudy.
+// The main airport is London Heathrow Airport.
+
+async function getDashboardData(query) {
+  const destinationsFetch = await fetch(
+    `http://localhost:3333/destinations?search=${[query]}`
+  );
+  const destinationsResponse = destinationsFetch.json();
+  console.log(`Il risultato per la città è:`, destinationsResponse);
+
+  const weathersFetch = await fetch(
+    `http://localhost:3333/weathers?search=${query}`
+  );
+  const weathersResponse = weathersFetch.json();
+  console.log(`Il risultato per il meteo è:`, weathersResponse);
+
+  const airportsFetch = await fetch(
+    `http://localhost:3333/airports?search=${query}`
+  );
+  const airportsResponse = airportsFetch.json();
+
+  console.log(`Il risultato per aereoporto è:`, airportsResponse);
+
+  const promises = [destinationsResponse, weathersResponse, airportsResponse];
+
+  const results = await Promise.all(promises);
+
+  console.log(results);
+
+  const data = {
+    city: results[0][0].name,
+    country: results[0][0].country,
+    temperature: results[1][0].temperature,
+    weather: results[1][0].weather_description,
+    airport: results[2][0].name,
+  };
+  console.log(data);
+  return data;
+}
+
+(async () => {
+  getDashboardData(`london`)
+    .then((data) => {
+      console.log("Dasboard data:", data);
+      console.log(
+        `${data.city} is in ${data.country}.\n` +
+          `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n` +
+          `The main airport is ${data.airport}.\n`
+      );
+    })
+    .catch((error) => console.error(error));
+})();

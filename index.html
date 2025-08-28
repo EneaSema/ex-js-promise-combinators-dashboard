@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard della città</title>
+    <script src="snack5.js"></script>
+  </head>
+  <body>
+    <h1>Dashboard della città</h1>
+
+    <ul>
+      In questo esercizio, utilizzerai Promise.all() per creare la funzione
+      getDashboardData(query), che accetta una città come input e recupera
+      simultaneamente:
+      <li>
+        Nome completo della città e paese da
+        <b>/destinations?search=[query]</b> (result.name, result.country, nelle
+        nuove proprietà city e country).
+      </li>
+      <li>
+        Il meteo attuale da <b>/weathers?search={query}</b> (result.temperature
+        e result.weather_description nella nuove proprietà temperature e
+        weather).
+      </li>
+      <li>
+        Il nome dell’aeroporto principale da
+        <b>/airports?search={query}</b> (result.name nella nuova proprietà
+        airport).
+      </li>
+    </ul>
+    Utilizzerai <b>Promise.all()</b> per eseguire queste richieste in parallelo
+    e poi restituirai un oggetto con i dati aggregati.
+
+    <h2>
+      Attenzione: le chiamate sono delle ricerche e ritornano un’array ciascuna,
+      di cui devi prendere il primo risultato (il primo elemento).
+    </h2>
+    <h3><b>Note del docente</b></h3>
+    <ul>
+      Scrivi la funzione
+      <b>getDashboardData(query)</b
+      >, che deve:
+      <li>Essere asincrona <b>(async)</b>.</li>
+      <li>
+        Utilizzare <b>Promise.all()</b> che risolve un oggetto contenente i dati
+        aggregati.
+      </li>
+      <li>
+        Restituire una <b>Promise</b> che risolve un oggetto contenente i dati
+        aggregati.
+      </li>
+      <li>Stampare i dati in console in un messaggio ben formattato.</li>
+      <li>Testa la funzione con la query "london"</li>
+    </ul>
+  </body>
+</html>
