@@ -206,7 +206,7 @@ console.log(`ciao`);
 //Stampa in console un messaggio di errore per ogni richiesta fallita.
 //Testa la funzione con un link fittizio per il meteo (es. https://www.meteofittizio.it).
 
-// SOLUZIONE TROVATA VEDENDO CORREZIONE CHIEDENDO SUPPORTO A GEMINI
+// SOLUZIONE TROVATAE CAPITA CHIEDENDO SUPPORTO A GEMINI E VEDENDO CORREZIONE E RICHIEDENDO SUPPORTO A GEMINI
 
 async function fetchJson(url) {
   const response = await fetch(url);
