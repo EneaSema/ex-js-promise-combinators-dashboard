@@ -41,62 +41,136 @@ console.log(`ciao`);
 // Today there are 18 degrees and the weather is Partly cloudy.
 // The main airport is London Heathrow Airport.
 
+// async function getDashboardData(query) {
+//   const destinationsFetch = await fetch(
+//     `http://localhost:3333/destinations?search=${[query]}`
+//   );
+//   const destinationsResponse = destinationsFetch.json();
+//   console.log(`Il risultato per la città è:`, destinationsResponse);
+
+//   const weathersFetch = await fetch(
+//     `http://localhost:3333/weathers?search=${query}`
+//   );
+//   const weathersResponse = weathersFetch.json();
+//   console.log(`Il risultato per il meteo è:`, weathersResponse);
+
+//   const airportsFetch = await fetch(
+//     `http://localhost:3333/airports?search=${query}`
+//   );
+//   const airportsResponse = airportsFetch.json();
+
+//   console.log(`Il risultato per aereoporto è:`, airportsResponse);
+
+//   const promises = [destinationsResponse, weathersResponse, airportsResponse];
+
+//   const results = await Promise.all(promises);
+
+//   // ALTRE SOLUZIONI POSSIBILI:
+//   // posso fare ho il destructturing di result:
+//   // const [destinations, weathers,airports] = results
+//   // OPPURE
+//   // crearmi le singole variabili:
+//   // const destinations = results[0]
+//   // const weathers = results[1]
+//   // const airports = results[2]
+//   // DEVO RICORDARMI IN QUESTI CASI DI PRENDERE IL PRIMO ELEMENTO DELL'ARRAY, QUINDI ELEMEMNTO CON INDICE ZERO [0]
+
+//   console.log(results);
+
+//   const data = {
+//     city: results[0][0].name,
+//     country: results[0][0].country,
+//     temperature: results[1][0].temperature,
+//     weather: results[1][0].weather_description,
+//     airport: results[2][0].name,
+//   };
+//   console.log(data);
+//   return data;
+// }
+
+// (async () => {
+//   getDashboardData(`london`)
+//     .then((data) => {
+//       console.log("Dasboard data:", data);
+//       console.log(
+//         `${data.city} is in ${data.country}.\n` +
+//           `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n` +
+//           `The main airport is ${data.airport}.\n`
+//       );
+//     })
+//     .catch((error) => console.error(error));
+// })();
+
+//🎯 Bonus 1 - Risultato vuoto
+// Se l’array di ricerca è vuoto, invece di far fallire l'intera funzione,
+// semplicemente i dati relativi a quella chiamata verranno settati a null e  la frase relativa non viene stampata.
+// Testa la funzione con la query “vienna” (non trova il meteo).
+
 async function getDashboardData(query) {
   const destinationsFetch = await fetch(
     `http://localhost:3333/destinations?search=${[query]}`
   );
   const destinationsResponse = destinationsFetch.json();
-  console.log(`Il risultato per la città è:`, destinationsResponse);
+  console.log(destinationsResponse);
 
   const weathersFetch = await fetch(
     `http://localhost:3333/weathers?search=${query}`
   );
   const weathersResponse = weathersFetch.json();
-  console.log(`Il risultato per il meteo è:`, weathersResponse);
+  console.log(weathersResponse);
 
   const airportsFetch = await fetch(
     `http://localhost:3333/airports?search=${query}`
   );
   const airportsResponse = airportsFetch.json();
-
-  console.log(`Il risultato per aereoporto è:`, airportsResponse);
+  console.log(airportsResponse);
 
   const promises = [destinationsResponse, weathersResponse, airportsResponse];
 
   const results = await Promise.all(promises);
-
-  // ALTRE SOLUZIONI POSSIBILI:
-  // posso fare ho il destructturing di result:
-  // const [destinations, weathers,airports] = results
-  // OPPURE
-  // crearmi le singole variabili:
-  // const destinations = results[0]
-  // const weathers = results[1]
-  // const airports = results[2]
-  // DEVO RICORDARMI IN QUESTI CASI DI PRENDERE IL PRIMO ELEMENTO DELL'ARRAY, QUINDI ELEMEMNTO CON INDICE ZERO [0]
-
   console.log(results);
 
+  const [destinations, weathers, airports] = results;
+
   const data = {
-    city: results[0][0].name,
-    country: results[0][0].country,
-    temperature: results[1][0].temperature,
-    weather: results[1][0].weather_description,
-    airport: results[2][0].name,
+    city: null,
+    country: null,
+    temperature: null,
+    weather: null,
+    airport: null,
   };
+
+  if (destinations.length > 0) {
+    data.city = destinations[0].name;
+    data.country = destinations[0].country;
+  }
+
+  if (weathers.length > 0) {
+    data.temperature = weathers[0].temperature;
+    data.weather = weathers[0].weathers_description;
+  }
+
+  if (airports.length > 0) {
+    data.airport = airports[0].name;
+  }
+
   console.log(data);
   return data;
 }
 
 (async () => {
-  getDashboardData(`london`)
+  getDashboardData("vienna")
     .then((data) => {
       console.log("Dasboard data:", data);
-      console.log(
-        `${data.city} is in ${data.country}.\n` +
-          `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n` +
-          `The main airport is ${data.airport}.\n`
-      );
+      let outString = `${data.city} is in ${data.country}.\n`;
+
+      if (data.temperature !== null) {
+        outString += `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n`;
+      }
+      if (data.airport !== null)
+        [(outString += `The main airport is ${data.airport}.\n`)];
+
+      console.log(outString);
     })
     .catch((error) => console.error(error));
 })();
