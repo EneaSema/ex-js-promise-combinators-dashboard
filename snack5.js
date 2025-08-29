@@ -65,6 +65,16 @@ async function getDashboardData(query) {
 
   const results = await Promise.all(promises);
 
+  // ALTRE SOLUZIONI POSSIBILI:
+  // posso fare ho il destructturing di result:
+  // const [destinations, weathers,airports] = results
+  // OPPURE
+  // crearmi le singole variabili:
+  // const destinations = results[0]
+  // const weathers = results[1]
+  // const airports = results[2]
+  // DEVO RICORDARMI IN QUESTI CASI DI PRENDERE IL PRIMO ELEMENTO DELL'ARRAY, QUINDI ELEMEMNTO CON INDICE ZERO [0]
+
   console.log(results);
 
   const data = {
