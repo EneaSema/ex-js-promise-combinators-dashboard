@@ -90,7 +90,7 @@ console.log(`ciao`);
 //   console.log(data);
 //   return data;
 // } catch (error) {
-//   console.log("Errore nel recuepro dei dati;", error.messagge)
+//   throw new Error ("Errore nel recuepro dei dati;", error.messagge)
 // }
 
 // }
@@ -135,10 +135,25 @@ console.log(`ciao`);
 //   const promises = [destinationsResponse, weathersResponse, airportsResponse];
 
 //   const results = await Promise.all(promises);
-//   console.log(results);
+//   console.log(`Risultati di promise.all:`, results);
 
 //   const [destinations, weathers, airports] = results;
-//   console.log(`Risultati di promise.all:`, results);
+
+// SOLUZIONE DI HYUR: CREARE 3 VARIABILI A CUI ASSEGNO IL PRIMO VALORE, QUINDI [0], DEI 3 ARRAY PER FARE IL TERNARIO
+//
+// const destination = destinations[0];
+// const weather = weathers[0];
+// const airport = aiports[0];
+// return {
+//    city: destination ? destination.name : null}
+//    country: destination ? destination.country : null}
+//    temperature: weather ? weather.temperature : null}
+//    weather: weather ? weather.weather_description : null}
+//    airport: airport ? airport.name : null
+//}
+// FINE SOLUZIONE HYUR
+//
+//
 
 //   const data = {
 //     city: null,
@@ -191,88 +206,81 @@ console.log(`ciao`);
 //Stampa in console un messaggio di errore per ogni richiesta fallita.
 //Testa la funzione con un link fittizio per il meteo (es. https://www.meteofittizio.it).
 
+// SOLUZIONE TROVATA VEDENDO CORREZIONE CHIEDENDO SUPPORTO A GEMINI
+
+async function fetchJson(url) {
+  const response = await fetch(url);
+  const obj = await response.json();
+  return obj;
+}
+
 async function getDashboardData(query) {
-  const destinationsFetch = await fetch(
-    `http://localhost:3333/destinations?search=${[query]}`
-  );
-  const destinationsResponse = destinationsFetch.json();
-  console.log(destinationsResponse);
-
-  const weathersFetch = await fetch(`https://www.meteofittizio.it`);
-  const weathersResponse = weathersFetch.json();
-  console.log(weathersResponse);
-
-  const airportsFetch = await fetch(
-    `http://localhost:3333/airports?search=${query}`
-  );
-  const airportsResponse = airportsFetch.json();
-  console.log(airportsResponse);
-
-  const promises = [destinationsResponse, weathersResponse, airportsResponse];
-
-  const results = await Promise.allSettled(promises);
-  console.log(`Risultati di promise.allSettled:`, results);
-
-  const data = {
-    city: null,
-    country: null,
-    temperature: null,
-    weather: null,
-    airport: null,
-  };
-
-  const [destinations, weathers, airports] = results;
-
-  if (results[0].status === `fulfilled` && results[0].value.length > 0) {
-    data.city = results[0].value[0].name;
-    data.country = results[0].value[0].country;
-  } else if (results[0].status === `rejected`) {
-    console.error(
-      "Errore nella richiesta per le destinazioni:",
-      results[0].reason
+  try {
+    const destinantionsPromise = fetchJson(
+      `http://localhost:3333/destinations?search=${[query]}`
     );
-  }
-
-  if (results.status === `fulfilled` && results[1].value[0].length > 0) {
-    data.temperature = results[1].value[0].temperature;
-    data.weather = results[1].value[0].weathers_description;
-  } else if (results[1].status === `rejected`) {
-    console.error("Errore nella richiesta per il meteo:", results[1].reason);
-  }
-
-  if (results.status === `fulfilled` && results[2].value[0].length > 0) {
-    data.airport = results[2][1].name;
-  } else if (results[2].status === `rejected`) {
-    console.error(
-      "Errore nella richiesta per li aereporti:",
-      results[2].reason
+    const weathersPromise = fetchJson(
+      `http://localhost:3333/weathers?search=${query}`
     );
-  }
+    const airportsPromise = fetchJson(
+      `http://localhost:3333/airports?search=${query}`
+    );
 
-  console.log(data);
-  return data;
+    const promises = [destinantionsPromise, weathersPromise, airportsPromise];
+    const [destinationResult, weatherResult, airportResult] =
+      await Promise.allSettled(promises);
+
+    const data = {};
+
+    if (destinationResult.status === `fulfilled`) {
+      const destination = destinationResult.value[0];
+      data.city = destination ? destination.name : null;
+      data.country = destination ? destination.country : null;
+    } else {
+      console.error(`Errore presente in destinazione: `, error.reason);
+      data.city = null;
+      data.country = null;
+    }
+
+    if (weatherResult.status === `fulfilled`) {
+      const weather = weatherResult.value[0];
+      data.temperature = weather ? weather.temperature : null;
+      data.weather = weather ? weather.weather_description : null;
+    } else {
+      console.error(`Errore presente nel meteo: `, error.reason);
+      data.temperature = null;
+      data.weather = null;
+    }
+
+    if (airportResult.status === `fulfilled`) {
+      const airport = airportResult.value[0];
+      data.airport = airport ? airport.name : null;
+    } else {
+      console.error(`Errore presente nel meteo: `, error.reason);
+      data.airport = null;
+    }
+    console.log(" Il dato finale è composto così:", data);
+    return data;
+  } catch (error) {
+    throw new Error("Errore nel recupero dei dati:", error.reason);
+  }
 }
 
 (async () => {
-  try {
-    const data = await getDashboardData("vienna");
-
-    console.log("Dasboard data:", data);
-
-    let outputString = "";
-
-    if (data.city !== null && data.country !== null) {
-      outputString += `${data.city} is in ${data.country}.\n`;
-    }
-
-    if (data.temperature !== null && data.weather !== null) {
-      outString += `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n`;
-    }
-    if (data.airport !== null)
-      [(outString += `The main airport is ${data.airport}.\n`)];
-
-    console.log(outString);
-  } catch (error) {
-    console.error("Si è verificato un errore:", error);
-  }
+  getDashboardData(`london`)
+    .then((data) => {
+      console.log("Dasboard data:", data);
+      let messagge = ``;
+      if (data.city !== null && data.country !== null) {
+        messagge += `${data.city} is in ${data.country}.\n`;
+      }
+      if (data.temperature !== null && data.weather !== null) {
+        messagge += `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n`;
+      }
+      if (data.airport !== null) {
+        messagge += `The main airport is ${data.airport}.\n`;
+      }
+      console.log(messagge);
+    })
+    .catch((error) => console.error(error));
 })();
